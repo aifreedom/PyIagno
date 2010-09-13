@@ -14,7 +14,7 @@ class IagnoFrame(wx.Frame):
                                                   | wx.MINIMIZE_BOX
                                                   | wx.MAXIMIZE_BOX)
         wx.Frame.__init__(self, *args, **kwds)
-        self.frame_1_statusbar = self.CreateStatusBar(2, 0)
+        self.frame_statusbar = self.CreateStatusBar(2, 0)
 
         self.Bitmaps = [wx.Bitmap("image/dark.png", wx.BITMAP_TYPE_ANY),
                         wx.Bitmap("image/light.png", wx.BITMAP_TYPE_ANY),
@@ -30,15 +30,16 @@ class IagnoFrame(wx.Frame):
     def __set_properties(self):
         self.SetTitle("PyIango")
         self.SetSize((320, 346))
-        self.frame_1_statusbar.SetStatusWidths([-4, -6])
-        frame_1_statusbar_fields = ["Dark's Move", "Dark: 2 Light: 2"]
-        for i in range(len(frame_1_statusbar_fields)):
-            self.frame_1_statusbar.SetStatusText(frame_1_statusbar_fields[i], i)
+        self.frame_statusbar.SetStatusWidths([-4, -6])
+        frame_statusbar_fields = ["Dark's Move", "Dark: 2 Light: 2"]
+        for i in range(len(frame_statusbar_fields)):
+            self.frame_statusbar.SetStatusText(frame_statusbar_fields[i], i)
 
     def __Draw(self, color, pos):
         x, y = pos
         dc = wx.ClientDC(self)
-        dc.DrawBitmap(self.Bitmaps[color], x*40, y*40, True)        
+        dc.DrawBitmap(self.Bitmaps[color], x*40, y*40, True)
+        
 
     # =======================================================
     # Event handlers
@@ -50,10 +51,12 @@ class IagnoFrame(wx.Frame):
         try:
             l = self.Game.Set((x/40, y/40))
         except self.Game.InvalidPositionException:
-            pass
+            self.frame_statusbar.SetStatusText('Invalid move.', 0)
         else:
             for yy, xx in l:
                 self.__Draw(player, (xx, yy))
+            self.frame_statusbar.SetStatusText(IagnoGame.PlayerStr[self.Game.GetPlayer()], 0)
+            self.frame_statusbar.SetStatusText("Dard: %d Light: %d" % (self.Game.DarkCnt, self.Game.LightCnt), 1)
 
     def OnPaint(self, evt):
         sz = (40, 40)
