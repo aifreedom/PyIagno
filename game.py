@@ -41,23 +41,22 @@ class IagnoGame(object):
     # =======================================================
     # Constructor
     # =======================================================
-    def __init__(self, init=None):
+    def __init__(self,
+                 ai = None,
+                 init = [[-1, -1, -1, -1, -1, -1, -1, -1],
+                         [-1, -1, -1, -1, -1, -1, -1, -1],
+                         [-1, -1, -1, -1, -1, -1, -1, -1],
+                         [-1, -1, -1,  1,  0, -1, -1, -1],
+                         [-1, -1, -1,  0,  1, -1, -1, -1],
+                         [-1, -1, -1, -1, -1, -1, -1, -1],
+                         [-1, -1, -1, -1, -1, -1, -1, -1],
+                         [-1, -1, -1, -1, -1, -1, -1, -1]]):
         """
         Initialize a new game.
-        init: the initial outline of the game.
+        param init: the initial outline of the game.
         """
-        self.__Board = []              # set the initial board
-        if init != None:               # if init is provided
-            for i in init:
-                self.__Board.append(i[:])
-        else:
-            for i in range(8):
-                self.__Board.append([self.BRD_BLANK] * 8)
-            self.__Board[3][4] = self.BRD_DARK
-            self.__Board[4][3] = self.BRD_DARK
-            self.__Board[3][3] = self.BRD_LIGHT
-            self.__Board[4][4] = self.BRD_LIGHT
-
+        self.__Board = copy.deepcopy(init) # set the initial board
+        
         self.__Len = 0                 # steps been taken
 
         self.__Valid = []              # valid place to set
@@ -83,7 +82,7 @@ class IagnoGame(object):
             x, y = pos
             self.__Board[x][y] = player
             self.__Len += 1
-            self.__Player = not self.__Player
+            self.__Player = int(not self.__Player)
             return self.__Update(pos)
         else:
             raise self.InvalidPositionException
@@ -140,7 +139,7 @@ class IagnoGame(object):
                 pass
             else:
                 for x, y in li:
-                    self.__Board[x][y] = not self.__Board[x][y]
+                    self.__Board[x][y] = int(not self.__Board[x][y])
                 ret += li
         self.__Maintain()
         return tuple(ret)
@@ -192,7 +191,7 @@ class IagnoGame(object):
     # =======================================================
     # For debug only
     # =======================================================
-    def __Output(self, msg=''):
+    def Output(self, msg=''):
         """
         For debug only, print the current board.
         """
