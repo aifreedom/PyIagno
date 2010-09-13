@@ -29,8 +29,8 @@ class InitGameTest(unittest.TestCase):
     def setUp(self):
         self.Game = IagnoGame()
 
-    def testLength(self):
-        assert len(self.Game) == 0, 'length not zero'
+    def testLength1(self):
+        assert len(self.Game) == 0, 'Initial length not zero'
 
     def testInitOutline(self):
         assert self.Game[3][3] == IagnoGame.BRD_LIGHT, '(3, 3) not light'
