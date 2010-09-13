@@ -1,0 +1,497 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0037)http://radagast.se/othello/howto.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Writing an Othello program</title>
+
+<link rev="made" href="mailto:gunnar@radagast.se">
+<!--<base target="_top">--><base href="." target="_top">
+</head>
+
+<body bgcolor="FFFFCC">
+
+
+<h2 align="CENTER">Writing an Othello program</h2>
+
+
+<hr>
+
+<a href="http://radagast.se/othello/howto.html#prerequisites" target="display">Prerequisites</a> /
+<a href="http://radagast.se/othello/howto.html#searching" target="display">Searching</a> /
+<a href="http://radagast.se/othello/howto.html#evaluation" target="display">Position evaluation</a> /
+<a href="http://radagast.se/othello/howto.html#opening" target="display">Opening knowledge</a> /
+<a href="http://radagast.se/othello/howto.html#endgame" target="display">Endgame</a> /
+<a href="http://radagast.se/othello/howto.html#source" target="display">Some source code</a> /
+<a href="http://radagast.se/othello/howto.html#resources" target="display">Other resources</a>
+
+<p>
+
+
+<a name="prerequisites"></a>
+</p><h2>Prerequisites</h2>
+
+In order to put together an Othello program of moderate strength,
+some programming experience is necessary.
+Most of the algorithms and data structures used can be found
+in textbooks on artificial intelligence, textbooks on algorithms
+and on the web.
+A good high school student or undergraduate student of computer
+science should be able to grasp the algorithms well enough to
+create a strong program.
+
+<p>
+
+Some of the more advanced techniques referred to below require some familiarity
+with optimization theory and linear regression; this material
+is on the level of undergraduate courses in applied mathematics.
+
+</p><p>
+
+The <em>real</em> difficulty with creating a strong Othello program
+is the debugging.
+Due to the nature of the search algorithms, bugs can lurk for quite
+a long time before surfacing (taking the programmer by surprise).
+The only advice I have here is to test all new modules thoroughly.
+
+
+<a name="searching"></a>
+</p><h2>Searching</h2>
+
+<ul>
+
+<li>
+<h3>Basics</h3>
+
+All the strong programs of today determine the best move in a
+position by searching many moves ahead: "If I make that move
+and he makes that move and I make that move etc., how good is
+the position for me?"
+Obviously, the number of positions arising even after only
+a few moves grows very fast; in most midgame positions,
+each players have about 10 moves each, so to look ahead
+only 9 moves (a search to depth 9 in programmer lingo)
+results in a billion (10^9) positions to investigate.
+Fortunately, it can be proved (mathematically) that a program
+need not consider all these positions in order to find the best move.
+Instead a procedure called <i>alpha-beta pruning</i> is used
+(a good description by Andy Walker can be found
+<a href="http://www.maths.nott.ac.uk/personal/anw/G13GAM/alphabet.html">
+here
+</a>).
+It greatly reduces the number of positions which need be examined.
+Variations of this algorithm are used in all strong Othello programs
+(as well as programs for other board games such as chess and checkers).
+A good Othello program would only have to look at 100'000-1'000'000
+positions in order to look 9 moves ahead instead of a
+billion without alpha-beta.
+There are several variations of alpha-beta, the most widespread being
+nega-scout (discovered by Alexander Reinefeld),
+but they do not differ fundamentally from plain alpha-beta pruning.
+
+<p>
+</p></li>
+
+<li>
+<h3>Move ordering</h3>
+For alpha-beta pruning, it is essential that the best moves in
+a position are searched first.
+This can be accomplished using several heuristics.
+One is to store "killer responses" to each move - if my opponent
+plays the X-square g2, I definitely should look at h1 first to see if the
+corner can be captured, and if this is a wise thing to do.
+Another useful heuristic is to perform shallow searches;
+before starting on a depth 12 search, the program searches the
+position to depth 2 and finds the move which looks best after
+the shallow search, which obviously takes negligible time
+compared to the full search.
+
+<p>
+
+</p></li><li><h3>Selective search</h3>
+The strongest Othello programs of today
+all use some form of selective search mechanism.
+The idea is very simple and resembles the thinking of human players:
+In most positions, many moves are obviously bad and need only be
+looked at long enough to determine that they are bad.
+This is usually implemented as follows:
+When searching a position to depth 12 (i.e., 12 moves ahead),
+the program starts by searching all moves available to depth 4
+and discards the moves which seemed really bad when searched
+to depth 4.
+The remaining moves are searched to depth 12.
+The concept of "really bad" is formalized by generating lots
+of statistics of how well a search to depth 4 predicts the
+result of a search to depth 12.
+This procedure is called <em>Multi Prob-Cut</em> (invented by
+Michael Buro) and the example above uses the "cut pair" 4/12.
+Obviously other cut pairs can be used, and most programs use many cut pairs.
+
+<p>
+</p></li>
+
+<li>
+<h3>What search algorithm to use</h3>
+Alpha-beta pruning can be used in any game-playing program,
+also programs with very little knowledge benefit greatly from
+this algorithm.
+Selective search algorithms, such as Multi Prob-Cut (MPC), only work
+well when the program has a good position evaluation.
+The reason for this is that the selectiveness introduces errors
+which can prove fatal.
+It also depends on certain other properties of the way positions
+are evaluated as evaluations of positions in different game stages
+are compared.
+For the best programs, MPC gives a real boost to the search depth
+- few programs get beyond depth 15-16 without MPC, but with MPC,
+depth 20-27 is reachable.
+
+<p>
+</p></li>
+
+<li>
+<h3>Transposition tables</h3>
+
+Often a position can occur after several move sequences,
+an example is the Tiger opening which can begin with
+f5-d6-c3-d3-c4 or f5-d6-c4-d3-c3, both sequences resulting in
+the same position.
+This is called a transposition.
+To avoid searching a position several times, the program
+stores all (or at least most) positions it has encountered
+during its search in a transposition table (usually implemented
+as the data structure <em>hash table</em>).
+In the midgame phase of Othello, this reduces the time
+for a deep search by 20-50% (estimates).
+In the endgame, where transpositions are much more common,
+the gain can be much higher.
+</li>
+
+</ul>
+
+
+<a name="evaluation"></a>
+<h2>Position evaluation</h2>
+
+This is by far the most important part of the program,
+if this module is weak it matters little if the program
+has great search algorithms.
+I will describe three different paradigms for creating
+evaluation functions.
+They describe the evolution of Zebra's knowledge and I
+believe that most Othello programs can be placed in one
+of these categories.
+
+<ul>
+
+<li>
+<h3>Disk-square tables</h3>
+The idea behind this type of evaluation function is that
+different squares have different values - corners are
+good and the squares next to corners are bad.
+Disregarding symmetries, there are 10 different positions
+on a board, and each of these is given a value for each
+of the three possibilities: black disk, white disk and empty.
+A more sophisticated approach is to have different values for
+each position during the different stages of the game; e.g.
+corners are more important in the opening and early midgame than
+in the endgame.
+
+<p>
+
+Programs with this type of evaluation are invariably weak
+(I have seen no exception to this rule).
+On the other hand, it is very easy to program this evaluation
+function, so many programmers start using this approach.
+And for most programmers, it suffices to make the program
+strong enough to beat its creator...
+
+</p><p>
+</p></li>
+
+<li>
+<h3>Mobility-based evaluation</h3>
+This more sophisticated approach substitutes the extremely local
+view of the board used in the disk-square tables by a more
+global view of the board.
+The key observation is that most human players strive to maximize
+mobility (number of moves available) and minimize frontier disks
+(disks adjacent to empty squares).
+These measures, or at least good approximations, can be found
+very quickly if coded efficiently, and they increase playing strength
+a lot.
+
+<p>
+
+Most programs with mobility-based evaluation functions also
+have some knowledge of edge and corner configurations and try to minimize
+the number of disks during the early midgame, another strategy
+used by human players.
+
+</p><p>
+</p></li>
+
+
+<li><h3>Pattern-based evaluation</h3>
+As mentioned above, programs of moderate strength often incorporate
+some knowledge about edge and corner configurations.
+Mobility maximization and frontier minimization are global features,
+but they can be broken down into local configurations which can be
+added together.
+The same goes for disk minimization.
+
+<p>
+
+This leads to the following generalization:
+Only use local configurations (patterns) in the evaluation function.
+The usual implementation is to evaluate each row, column, diagonal
+and corner configuration separately and add together the values.
+For this to work out well, lots of different patterns have to
+be evaluated - there are 3321 different edge configurations alone,
+and when all the configurations are counted, there are tens
+of thousands.
+To make bad things worse, the relative values of the different
+configurations are highly game-stage dependent.
+Clearly, the process of determining values for all configurations
+must be done automatically.
+This is done by taking a large database of games played between
+strong players and calculating statistics for each configuration
+in each game stage from all the games.
+Exactly how this is done varies from program to program and is
+beyond the scope of this document anyway - but see the papers
+written by Michael Buro to which there is a link at the
+bottom of this page.
+
+</p><p>
+
+In the process of determining the relative values of the
+different configurations, one must decide what the evaluation
+function should try to predict.
+The most common choice to predict the final disc difference.
+I believe that Hannibal used a weighted disk difference
+measure where the winning side gets a bonus corresponding
+to a number of disks.
+</p></li>
+
+</ul>
+
+
+<a name="opening"></a>
+<h2>Opening knowledge</h2>
+
+All strong programs use opening books and update their
+books automatically after each game.
+Most of the top programs have opening books which to some extent
+are based on IOS/GGS games, so the books have a large overlap.
+What differs is how the information from the games is
+used.
+An approach, used by all top programs, is to go through all positions from all
+games in the game database and determine the best move not
+played in any database game.
+This is time-consuming as a deep search must be performed for each
+position, but once this is done, updating the book on the fly
+is easy - after each game played, all new positions (and maybe some
+old) are searched for the best deviation.
+Using the resulting set of positions and moves (both deviations
+and moves actually played) the best book lines for both sides can
+be determined using a simple minimax search.
+
+<p>
+
+Some other programs don't store deviations
+from each position but instead calculate deviations on the fly.
+The main advantage of this approach is that there is no need to
+calculate the deviations (which is very time-consuming).
+There are several drawbacks though; this kind of opening book
+is much more vulnerable to weak moves in the game database which can
+lead to dead lost positions straight out of book.
+
+
+<a name="endgame"></a>
+</p><h2>Endgame</h2>
+
+As the number of moves available to each player decreases towards
+the end of the game, the programs can search much deeper in
+the endgame phase of the game.
+This enables them to play the endgame much better than any human;
+watching computers play the endgame often feels quite weird as
+both opponents know the outcome of the game with more than 20 moves
+left!
+For computer programs, the endgame starts in what most humans
+would refer to the late midgame; with 20-30 moves left of the game.
+
+<p>
+
+The search algorithms used in the midgame work well in the endgame
+as well (including a variation of MPC).
+The objective changes though: For a program, the endgame starts
+when it can calculate who is winning, i.e., follow all variations
+until no player has any move left.
+This is usually with 24-30 moves left for the top programs.
+When the program knows who is winning, it starts to optimize the
+score (win by as much as possible).
+This usually is much harder than determining who is winning
+(unless the position is a draw) and can usually be accomplished
+with 23-28 moves left.
+
+</p><p>
+
+Good endgame performance is all about move ordering, and it pays
+off to use move ordering heuristics different from those used
+in the midgame.
+The reason is as follows: Most lines analyzed contain one or more
+blunders, and it when finding a refutation of a bad move it
+suffices to find <i>any</i> refutation, not necessarily the <i>best</i>
+refutation. As we want the program to solve a position as fast as
+possible, it makes sense to look for the <i>fastest</i> refutation
+(measured in thinking time). This is accomplished by searching moves
+after which the opponent has low mobility earlier than they would
+be searched in the midgame.
+This is commonly referred to as the Fastest-First heuristic.
+
+</p><p>
+
+<a name="source"></a>
+</p><h2>Some source code</h2>
+
+<dl>
+
+<dt>
+<strong>Basic endgame solver</strong>
+</dt><dd>
+<p>
+When I started working on computer Othello I downloaded an endgame solver
+created by Warren Smith and later improved by Jean-Christophe Weill.
+I then improved it myself, the resulting solver is found
+<a href="http://radagast.se/othello/endgame.c" target="display">here</a>.
+A more sophisticated endgame solver written by Richard Delorme
+can be found
+<a href="http://abulmo.club.fr/resources/solver/doc/index.html">here</a>.
+</p><p>
+</p></dd>
+
+<dt>
+<strong>Bitboard trickery</strong>
+</dt><dd>
+<p>
+<a href="http://radagast.se/othello/zebra.html" target="display">Zebra's</a> endgame solver is very fast,
+maybe the fastest around.  One reason for this is that it represents the
+Othello board as four 32-bit words, two words for the black discs and
+two words for the white discs.
+Using this representation it is possible to write a very fast move generation
+functions.
+The fastest-first heuristics used for move ordering benefits from this as well,
+<a href="http://radagast.se/othello/bitmob.c" target="display">here</a>
+you find a C+assembly function that computes
+the number of legal moves for one player in less than 200 clock cycles on
+an AMD Athlon - I have not timed it on other platforms, on a Pentium III I
+expect the cycle count to be roughly the same, whereas on a Pentium IV my guess
+is that it needs 300-400 cycles.
+
+</p><p>
+
+The code is used as follows: Call <tt>init_mmx()</tt> to initialize some
+constants (you only have to call this function once), then
+use <tt>bitboard_mobility()</tt> to get the mobility.
+The code can be compiled as C code using GCC's <tt>asm</tt> extension.
+It is straightforward but boring to convert it into code that can be
+compiled using Microsoft Visual C++.
+
+</p><p>
+
+The main trick used by the code is to find all moves that flip discs in
+a certain direction, e.g. up, in parallel.
+This can be done in several different ways, this code uses a variation
+first suggested by Richard Delorme which I have improved somewhat.
+There are 8 possible flip directions, 6 of these are managed by the MMX
+ALUs and the remaining 2 by the integer ALUs.
+
+</p><p>
+
+Currently the code averages about 2 instructions per clock cycle on an
+AMD Athlon - 400 instructions in 200 cycles.
+Using the processor optimally it should be possible to execute 3
+instructions per clock cycle.
+For this application it may be impossible to attain the theoretical optimum,
+but it almost certainly is possible to improve on my code by considering
+pairing and register stalls throughout - I am a novice assembly programmer and
+have probably introduced lots of unnecessary stalls.
+It is possible to make it slightly faster by using the <tt>psadbw</tt>
+instruction which is available on Pentium III, Pentium IV, and Athlon.
+
+
+</p><p>
+
+<i>
+Since I wrote the above texts, Toshihiko Okuhara has contributed
+even faster bitboard code.
+Download the Zebra source code if you are interested in it.
+</i>
+
+
+</p></dd></dl>
+
+<p>
+
+
+<a name="resources"></a>
+</p><h2>Other resources</h2>
+
+<dl>
+
+<dt>
+<a href="http://www.io.com/~rgatliff/othello/bib3.html">
+Annotated bibliography of Othello programming.
+</a>
+</dt>
+<dd>
+Contains references to research papers in this area.
+Almost all the material covered on this page can be found
+in the papers listed.
+</dd>
+
+<dt>
+<a href="http://satirist.org/learn-game/">
+Machine learning in games
+</a>
+</dt>
+<dd>
+Jay Scott maintains this large web site covering all aspects of
+game programming.
+Contains many different games, not only board games but also
+robotic soccer and adventure game AI.
+Many techniques are reviewed and there are links to other resources
+on the Internet.
+Very good site.
+</dd>
+
+<dt>
+<a href="http://www.cs.ualberta.ca/~mburo/publications.html">
+Michael Buro's publications
+</a>
+</dt>
+<dd>
+Here the breakthrough papers by Michael Buro can be
+downloaded.
+If you want to create a strong Othello program, reading these
+papers is strongly recommended.
+</dd>
+
+</dl>
+
+
+<p>
+
+</p><hr>
+
+<p>
+
+Last modified April 2, 2007 by
+<a href="http://radagast.se/">
+Gunnar Andersson
+</a>
+</p><address>
+<a href="mailto:gunnar@radagast.se">gunnar@radagast.se</a>
+</address>
+
+
+ 
+</body></html>

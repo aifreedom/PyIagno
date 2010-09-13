@@ -1,0 +1,245 @@
+
+<!-- saved from url=(0061)http://www.maths.nott.ac.uk/personal/anw/G13GAM/alphabet.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <title> G13GAM -- Game Theory -- alpha-beta pruning </title> <link type="image/x-icon" rel="shortcut icon" href="data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="></head>
+
+<body bgcolor="#d8a070" text="black">
+
+	<h1> G13GAM -- Game Theory </h1>
+
+	<a name="top"></a>
+
+	<h2> Alpha-beta pruning </h2>
+
+Alpha-beta pruning is a potentially hard concept because, at one level,
+it's counter-intuitive.
+We can understand that we don't want to look at <i>bad</i> moves, why
+is it that we don't want to look at <i>good</i> moves?
+The first partial answer is that this is the other side of the same
+coin -- a move that is good for me is bad for you.
+The second partial answer is that it isn't that we don't want to know
+about good moves, rather that it's their existence not their details
+that matter.
+The third partial answer is that we don't need so much <i>good</i> moves
+as <i>good enough</i> moves;
+it is because `good enough' moves are much easier to find than `good' moves
+that this technique makes a huge improvement to any game-playing program.
+
+
+	<h3> What is alpha-beta pruning? </h3>
+
+[The name is essentially completely arbitrary -- the two variables
+concerned in a computer program happened to be called alpha and beta,
+and we might just as well have had fred-jim pruning, p-q pruning or
+foo-bar pruning.]
+<p>
+<img src="data:image/gif;base64,R0lGODdhkQEsAfcAAAAAAACqAP8AAP+q/////wBCAAAfAAAoahBmAAqZAKXMAAj/BEMzAFtmANiZJwDMAAD/AAAzEQBmAACZAAD/JQAAEwAz+AD/+QAzAACZ938AEP8AY50Afej5EAcMEADDVgAH8lVkQBAQEA8PB8p8VHCYeAAAQwEAQSMAiAAQAAAPAAB8AC2Y7BAAAAQAACsAABAAJwABAAIG/wBBQwAUQfgkoAAQEAAPQQB8LPmY0AAAB/cfaiGY+QcADAAAwwIABw4eZAA09wAMDADAwwCmBwGIZBAQAA8KALelAKAIAAAAf0MA/20AqyAAOEFDAGddAPjMAA8AAHwAAJggAAFQAAMhAAcMAADDAAAHAFVkAAAQD0MPgDfvNOQ4SBAAEAoAQaUALAgA0AAAEEMAAWAAdUwgvAOYCAB/AAD/QwCdPx5YOAAPB7h8VCSYeAAPEwDKABZwnQMG/0ZBVokUGcwkkH8QEP8KQZ2lLOwI0P9DAZ1bdeicvH8QAP8PAJ18ANSY+Qx/AMD/Q9GrSFA4ACgA9wcMDAGxBzDIZAcQEAAKDwKlfAkImAB/B0P/ADurAiw4DgAABBAADBdDw7VdB6jMZAAADwAAfAAgmAABygBQcAAhmAAEDwArygAQcAACAAwAAMAAQ9EAIVD4aAcAEAIAfAn5mH8AAJ0AAOj3H/8AD50SfNSEmAAMAAA4AB4IHgACNAAADEEAwB8AphAAiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAkQEsAQAI/gAJBCAwQCBBgwUHJjyoEKHDhhAZSlxI8eFEixUjZryoEaPHjiA5itxI8uNIkyVDpjypEqXLljBZylxJ8+VMjwUJHNSZc6fPnkB1/hQalCfRo0aTDlVadKnTplCRPpUalSnVq1azTtVadavXrmCxfhUblivZs2bTjq0Zk+3Ntjbdyo1LF67dt3jn3tWbt27fvX75rlRbdixhtIYTF16MmPHhx4obS4bsODLlyZYzdwXM+a9nwYFDdwY9WvRn06RPl16t+mDl15hhX56tObZt2rJr476tu3fu30dTC0dNnPVw48VbH1eefLnz5hZ3S/fNG/h069SvV9+uvXv2702R/otnPv55eejn05Nfb569S+zwuYOXH997/fn26evPf7m9f/TuqfefgAAOGOCBBi7EH34M3ufgfg1C+OCCE0aoFIEYIljghhkmyKGGHX5YUoUkSmgihSdaqGKJKLY4lYchxgjijDDSKOKNMrrlIosrpsjjjz4GuaOQmeWIo41GJonkkjU2CR2QQ0bZo5RQTmlllfE5qaSWTB7J5ZdehnkXlURiWeaZZKZ5JZpFdrkXAHCCuaWYbtYpp510mUkZnGuqqWefgP4p6Fl3ugXnnIjimWihdN7pHQAn8uknm4NOammglEolHgBswcmnpwx5CmlBcRIgagCeNnSqoqwyumij/rAiF9+oaElqKlF8DpBrrqZyqpOtkkpaKaaXDmtspoctB2pNpaK60aG9KsRrqc1G22qs176qbbYidQfqWHFC6pOo4gIrrq6jkvstseweW+xRAsQrr7uAIgdqW58iNK2vzfI5ELTQusqtwAQbJO/BAhRsJHyeLsbrr+XuSiu15vL0cLvIYvyuUQgfrDGmx5FrKAARgaruxJ/62+u9A2OrcKsde/xyjdqR+zG9OGf8Z8zx6uyzTsaRu+3MLhetLc8JG42ndSdvfPPPT0+KdNRrDtf00EoTjXWIMWeN7XUn5+y02FQ/2DHZPLLWtNYtb93222yDBtzJF6MNtd1j3623/nbC0U0y3F67HXfggHc2nd97l5043ornTVtpfqs8uOCET1745QX9FrmvjjfuOeOgL97a5phXbjrlqJcekXSkfy5656HD/rpPo20e8Omq52757rDmZru4rssufPDED0ra77ynnrzuuHO52+/Fzx579MNXuSmkyjevffbctzwr59SHP/340pvoHK/dL6/+9syr9+i55Vcfv/jz/3k9++unj//+IX5PvvwApF8AH3Q+WunvgO1LYP48874B1u+BDoygiu6HwAVakH8KzJN+SiXB/wnwgx6MSgEzWEEMXrCEMWkgCCG4wg6ysDAUJKEMTzhDEzrE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" align="right" border="2">
+When we are called upon to analyse a position, we will be given two
+`levels', alpha and beta.
+These are the `floor' and `ceiling', respectively, of the range of
+values our caller is interested in.
+Think of the beta level as representing a value which is `good enough';
+we'll worry later about what `good enough' really means, and also
+about what the alpha level means.
+Let us suppose that a full analysis would give us the picture shown to
+the right:
+we see that of the nine possible moves, moves 1, 4, 5 and 9 are reasonably
+good, moves 2, 6 and 7 are so-so, move 3 is a disaster, and move 8 is
+the star move we would like to find.
+These values could be found by static evaluation, or by dynamic [recursive]
+evaluations looking deeper in the game tree.
+<img src="data:image/gif;base64,R0lGODdhkQEsAfcAAAAAAACqAP8AAP+q/////8MAAAcAAGQAahAAAAoAAKUAAAgABENAAFucANgsJwAzAABmAACZEQBCAAAfAAAoJQAAEwAMAADDAAAHAABk+AAgAAAg+QAg938gXv8gOZ0gRegg2AcMEADDVgAH8lVkQBAQEA8PB8p8VHCYeAAAQwEAQSMAiAAQAAAPAAB8AC2Y7AQAACsAABAAJwABAAIG/wBBQwAUQfgkoAAQEAAPQQB8LPmY0AAAB/cfagSY+QwADMMAwwcAB2QeZAA09wAMDADAwwCmBwGIZBAQAA8KALelAKAIAAAAf0MA/20AqyAAOABDAABdAADMAAQgAAFQAAAhAABGAACJAFXMAAAAD0MAgDcENOSzSBAAEAoAQaUALAgA0AAAEEMAAWAAdUwgvAOYCAB/AAD/QwCdPx5YOAAPB7h8VCSYeAAPEwDKABZwnQMG/0ZBVokUGcwkkH8QEP8KQZ2lLOwI0H8AEP9DAZ1bdeicvH8QAP8PAJ18ANSY+Qx/AMD/Q9GrSFA4ACgA9wcMDAGxBzDIZAcQAAAKAAKlAAkIBkP/ADurACw4AgAABCRDEJ5dDmjMdAAAfAAgmAABygBQcAAhmAAEDwArygAQcAACAAwAAMAAQ9EAIVD4aAcAEAIAfAn5mH8AAJ0AAOj3H/8AD500fNScmAA4AB4IHgAANEHDwB8HphBkiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAkQEsAQAI/gAJBCAwQCBBgwUHJjyoEKHDhhAZSlxI8eFEixUjZryoEaPHjiA5itxI8uNIkyVDpjypEqXLljBZylxJ8+VMjwUJHNSZc6fPnkB1/hQalCfRo0aTDlVadKnTplCRPpUalSnVq1azTtVadavXrmCxfhUblivZs2bTjq0Zk+3Ntjbdyo1LF67dt3jn3tWbt27fvX75rlRbdixhtIYTF16MmPHhx4obS4bsODLlyZYzdwXM+a9nwYFDdwY9WvRn06RPl16t+mDl15hhX56tObZt2rJr476tu3fu30dTC0dNnPVw48VbH1eefLnz5hZ3S/fNG/h069SvV9+uvXv2702R/otnPv55eejn05Nfb569S+zwuYOXH997/fn26evPf7m9f/TuqfefgAAOGOCBBi7EH34M3ufgfg1C+OCCE0aoFIEYIljghhkmyKGGHX5YUoUkSmgihSdaqGKJKLY4lYchxgjijDDSKOKNMrrlIosrpsjjjz4GuaOQmeWIo41GJonkkjU2CR2QQ0bZo5RQTmlllfE5qaSWTB7J5ZdehnkXlURiWeaZZKZ5JZpFdrkXAHCCuaWYbtYpp510mUkZnGuqqWefgP4p6Fl3ugXnnIjimWihdN7pHQAn8uknm4NOammglEolHgBswcmnpwx5CmlBcRIgagCeNnSqoqwyumij/rAiF9+oaElqKlF8DpBrrqZyqpOtkkpaKaaXDmtspoctB2pNpaK60aG9KsRrqc1G22qs176qbbYidQfqWHFC6pOo4gIrrq6jkvstseweW+xRAsQrr7uAIgdqW58iNK2vzfI5ELTQusqtwAQbJO/BAhRsJHyeLsbrr+XuSiu15vL0cLvIYvyuUQgfrDGmx5FrKAARgaruxJ/62+u9A2OrcKsde/xyjdqR+zG9OGf8Z8zx6uyzTsaRu+3MLhetLc8JG42ndSdvfPPPT0+KdNRrDtf00EoTjXWIMWeN7XUn5+y02FQ/2DHZPLLWtNYtb93222yDBtzJF6MNtd1j3623/nbC0U0y3F67HXfggHc2nd97l5043ornTVtpfqs8uOCET1745QX9FrmvjjfuOeOgL97a5phXbjrlqJcekXSkfy5656HD/rpPo20e8Omq52757rDmZru4rssufPDED0ra77ynnrzuuHO52+/Fzx579MNXuSmkyjevffbctzwr59SHP/340pvoHK/dL6/+9syr9+i55Vcfv/jz/3k9++unj//+IX5PvvwApF8AH3Q+WunvgO1LYP48874B1u+BDoygiu6HwAVakH8KzJN+SiXB/wnwgx6MSgEzWEEMXrCEMWkgCCG4wg6ysDDXkxhBZIiuGabr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" align="left" border="2">
+</p><p>
+The second picture shows what could happen for various possible beta levels.
+The top [dotted] line shows a high level.
+In this case, almost no gain is made;
+none of the first seven moves is `good enough', but move 8 at last goes over
+the line, and we can return its value.
+If the line had been a little higher, then <i>no</i> move would have been
+over the line, nothing would have been gained, and we would have had to
+do a full evaluation of all nine moves.
+The middle [dashed] line shows a lower beta level.
+In this case, move 4 is already `good enough'.
+<i>We do not need even to glance at moves 5 to 9.
+We can stop the analysis immediately, and return the value of move 4.</i>
+The bottom [mixed] line shows an even more favourable situation;
+here the very first move is `good enough', and we can return its value
+without glancing at moves 2 to 9.
+This can be a <i>huge</i> saving of time.
+We've saved 8/9 of the analysis already;
+but it can be better than this in the context of dynamic analysis, for we
+can make similar savings at every level of the tree, equivalent [in this
+example] to having a computer which is potentially 9×9×9×...
+times faster, and the deeper we look, the bigger the advantage.
+Note that the advantage is maximised by having the beta level as low
+as possible, and by having `good enough' moves as early in the
+list of moves as possible.
+<img src="data:image/gif;base64,R0lGODdhkQEsAfcAAAAAAAAA/wCqAP8AAP+q/////wEAADAAahAAAAoAAKUAAAgABENAAFucANgsJwAQAAAPAAB8AACYEQBCAAAfAAAoJQAAEwAMAADDAAAHAABk+AAgAAAg+QAg938gEP8gZJ0gB+ggsAcMEADDVgAH8lVkQBAQEA8PB8p8VHCYeAAAQwEAQSMAiC2Y7AQAACsAABAAJwABAAIG/wBBQwAUQfgkoAAQEAAPQQB8LPmY0AAAB/cfahAQAAoPAFd8ABCY+QwADMMAwwcAB2QeZAA09wAMDADAwwCmBwGIZA8KALelAKAIAAAAf0MA/20AqyAAOABDAABdAADMAAFQAAAhAAcAAABGAACJAFXMAAAAD0MAgDcENOSzSBAAEAoAQaUALAgA0AAAEEMAAV4AdfQgvAOYCAB/AAD/QwCdPx5YOAAPB7h8VCSYeAAPEwDKABZwnQMG/0ZBVokUGcwkkH8QEP8KQZ2lLOwI0H8AEP9DAZ1bdeicvH8QAP8PAJ18ANSY+Qx/AMD/Q9GrSFA4ACgA9wcMDAGxBzDIZAcQAAAKAAKlAAkIBkP/ADurACw4AgAABCRDEJ5dDkDMZAAAfAAgmAABygBQcAAhmAAEDwArygAQcAACAAwAAMAAQ9EAIVD4aAcAEAIAfAn5mH8AAJ0AAOj3H/8AD50gfNRKmAA4AB4IHgAANAAADEEAwB8AphAAiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAkQEsAQAI/gALCChAQCBBgwUHJjyoEKHDhhAZSlxI8eFEixUjZryoEaPHjiA5itxI8uNIkyVDpjypEqXLljBZylxJ8+VMjwULHNSZc6fPnkB1/hQalCfRo0aTDlVadKnTplCRPpUalSnVq1azTtVadavXrmCxfhUblivZs2bTjq0Zk+3Ntjbdyo1LF67dt3jn3tWbt27fvX75rlRbdixhtIYTF16MmPHhx4obS4bsODLlyZYzdwXM+a9nwYFDdwY9WvRn06RPl16t+mDl15hhX56tObZt2rJr476tu3fu30dTC0dNnPVw48VbH1eefLnz5hZ3S/fNG/h069SvV9+uvXv2702R/otnPv55eejn05Nfb569S+zwuYOXH997/fn26evPf7m9f/TuqfefgAAOGOCBBi7EH34M3ufgfg1C+OCCE0aoFIEYIljghhkmyKGGHX5YUoUkSmgiZANMFsCKOq3o4osBtBhjATDCKKOMNbJI44w5unjjjj3+2KOORA4ppJE74pjjkUEmCeSSTg7J45Q2wuZhiFiCOMBcMV4J4pdeholRAJ1ReKKFaIaVYolmtpnmmRXOmFmWbgFgJ5gi+jXAnnjSmaefgLIUAGhsZnbnm26WtWeKhg0K56OJQopohGLadWeglR60KF1d/tnnp5mGapN0ADxoZ6GokrXoYjOmGumr/pPGyVtpANxkp50C3NrQrQAodCcBvBZwK0LBYlrconu6FaOxzILqKWmOAvZbrWOdqlOpQh2qLbXA1lqQtcJSe2is+iG7JlqOwuoquepKGhZpus70q7AcXXppuL56O2+utTYrmLlwdervswQPnOFuwxJ2J7U78YotuONu6zC27U5nbmOtuquxfeaeWzGDclY22q119ortQLgS9Ou81vIr0L2iItdxijEt66zBb818Ls7QEsrbsIUdmpPE13K7MsQMC72xbzOXlS67UL+mM6PrPthpf6E5/BbML+M6ca8qn0py12PzbNPMNwl889p8TT2A2aOR6RluWke99IRo2/0x/t46V31myJh1pjXcbAc2NeExnzZ14elF2xdsX98t+YKLp/W033s3Vjnm810dmWBfJy76sX27pPboiDddMJhy80Vb5JzHvt3ismfO8cW1fwc4ZJx9jfjqbbvN+PCoE1+X43O99rXStuttmdtUY3X55M7nbr1tfC3fr/G/dwS96dyHX/z4o1qm/fXNLwY9WBmnTz36UO+e2F7atyw+8HVBn6xJNpPf/f3iQR5dKlM/b73vgJfRn8eWMj33ObB6CFxLXQr4P/8RRIEtOR3+KrhBAIrkMgWMIPyqokA+PaV9EHzgCP82K7wUkGscjKFI+tdBC9rw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" align="right" border="2">
+</p><p>
+Note however that once pruning has taken place, we are no longer returning
+the true value of a position.
+The third picture shows this in the context of the middle [dashed]
+beta level.
+The true value of this position is the value of the best move, move 8.
+But we are returning the value of move 4, the first `good enough' move;
+we don't know whether or not later moves will be even better, so all we
+can say is that the true value of this position is <i>at least</i> the
+value of move 4.
+This is shown by the arrow.
+The [potentially huge] savings made by pruning the moves in the blue box
+are [slightly] offset by the loss of information and the return of a
+lower bound rather than a true value.
+Very often, the lower bound is all we need, and the pruning is pure gain.
+<img src="data:image/gif;base64,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" align="left" border="2">
+</p><p>
+This leaves two questions.
+Where do the alpha and beta levels come from?
+And what is the alpha level for?
+They come from whoever asked us to analyse this position;
+we in turn will pass them on to any subsidiary [`dynamic'] analysis.
+Because positions are evaluated from the point of view of the player to move,
+they will be `inverted' when they are passed on -- the caller's `ceiling'
+is the callee's `floor', and vice versa.
+So the alpha level, the `floor', will become the beta level, the ceiling,
+for the subsidiary analysis;
+the higher we can make the floor, the lower will be the resulting ceiling,
+and so the more efficient will be that analysis.
+The next picture, left, shows this in action.
+We have inherited alpha and beta levels from our `parent'.
+After evaluating move number 1, we are no longer interested in moves that
+are worse than this, so we can raise the floor to the corresponding value.
+Moves 2 and 3 now fall below this floor;
+these values come from the `children' discovering moves above their
+beta level, so all we can say is that these values are upper bounds on the
+true values -- but even the upper bounds are below our floor, so we don't
+need to know the true values, just that moves 2 and 3 are worse than move 1.
+This is indicated by the arrows again;
+note that the tops of the arrows are higher than the corresponding dots were
+in the previous pictures.
+</p><p>
+In summary, when we evaluate a move, one of three things will happen:
+<i>(a)</i> The value lies between alpha and beta.
+In this case, this move is potentially interesting -- it may be the best
+move in the position, and its value may be the value of the position
+as a whole.
+We can raise the value of alpha to match, for we are no longer interested
+in exact values of worse moves.
+<i>(b)</i> The value is at least beta.
+This move is `good enough', and causes a `beta cutoff'.
+We return its value as a lower bound for the true value without
+bothering to evaluate the remaining moves.
+This value will, after inversion, be below the floor for the `parent'.
+The move causing the cutoff is sufficient to `refute' the move leading
+to this position.
+<i>(c)</i> The value is at most alpha.
+This move has been refuted, possibly by a beta cutoff in the `child'.
+This value is an upper bound, not the true value, which may be much worse,
+but this will not affect the value of the current position.
+
+	</p><h3> Value of alpha-beta </h3>
+
+Some [rather ignorant!] programmers treat alpha-beta pruning as an
+`optional extra', a modest bonus that makes searching slightly
+more efficient at the expense of sophisticated programming.
+Not so!
+Its use typically <i>doubles</i> the depth to which the program
+can search.
+Since the tree is growing exponentially with increasing depth,
+this is equivalent to an exponential growth in the speed with
+which the program can search.
+<p>
+However, the pruning is seen to full advantage only if
+<i>(a)</i> the beta levels are low enough to be interesting, and
+<i>(b)</i> the first move tried is often `good enough'.
+So much effort has gone in to ensuring that these two conditions hold.
+</p><p>
+An insight into the help that alpha-beta pruning gives can be had by
+imagining that Kasparov is sitting next to you suggesting good moves
+to try.
+When you are doing well, and when his suggestions are good, you do not
+need to consider anything beyond his ideas, and your analysis can be
+conducted much more efficiently -- a beta cutoff!
+If his suggestions are bad, then you will have to consider other ideas
+as well [this is point <i>(b)</i> above!], but even rotten suggestions
+do not cost you anything compared with no suggestions at all
+If your <i>position</i> is bad, then his suggestions do not [indeed,
+cannot] help;
+all the evaluations will be too low to cause a cutoff;
+but even in this case, his suggestions will raise the floor as far as it
+can be raised [if he gives you the best ideas first], so that deeper
+analysis will see a lower ceiling and easier cutoffs [this is point
+<i>(a)</i> above].
+In most lines, with best play [as suggested by Kasparov!], good positions
+and bad positions will alternate [my piece up is your piece down!];
+alpha-beta pruning causes very quick cutoffs in the good positions,
+which is why you can search twice as deeply.
+Of course, in real life your computer does not have access to Kasparov;
+it has to do the best it can with its own analysis.
+
+	</p><h3> Refinements </h3>
+
+The `correct' way to use alpha-beta pruning is to start with alpha
+set to minus infinity, beta to plus infinity, and to rely on the
+natural `raising of the floor', seen above, to make the bounds more
+useful.
+However, this creates a tension with the observation above that the
+pruning works best if the bounds are as tight as possible.
+So other strategies are possible.
+<p>
+Essentially, in all of these, we lie to our children about our
+proposed alpha-beta bounds.
+Our children must, however, tell us the truth, as outlined above:
+if the value is between alpha and beta, they must return the correct
+value, otherwise they return an upper or lower bound.
+Our lies mean that we place the bounds closer than they should have
+been, and therefore that the search is more efficient.
+The penalty is that sometimes we are caught out.
+Even so, we will quite often get away with it;
+if the returned value is outside the true bounds, then we only need
+the upper or lower bound anyway.
+If however it is inside the true bounds but outside the fraudulent bounds,
+then we have to ask our children to look again, and to refine their
+evaluations.
+So, the search is made sometimes more efficient and sometimes less.
+Where the balance lies is a matter of pragmatism and experiment.
+</p><p>
+Once this viewpoint is accepted, then describing this as `lying'
+carries unwanted moral overtones.
+We should instead re-define the purpose of the analysis as being to
+provide a value which is either `guaranteed' or else merely a bound,
+as described above.
+Then we can ask our children questions with a clear conscience!
+</p><p>
+Effectively, we are asking of the analysis questions like `In this
+position, is White between 1 and 2 pawns up?', and getting answers like
+`Yes, White is 1.376 pawns up' or `No, White is at least 2.3 pawns up',
+or `No, White is no more than 0.52 pawns up'.
+[All of these questions and answers relative to the requested depth
+of analysis, of course.]
+These questions can be answered much more efficiently than the blunt
+`How many pawns up is White?', and the answers are usually, but not
+always, sufficient.
+When they are not sufficient, we have to ask again, `OK, is White between
+2.3 and 3 pawns up', and balance these extra questions against the
+extra efficiency.
+
+	</p><p><a name="tail"></a> <a href="http://www.maths.nott.ac.uk/personal/anw/G13GAM/alphabet.html#top"> top of page </a>
+</p><hr>
+	<a href="mailto:anw@maths.nottingham.ac.uk">
+	 <img src="data:image/gif;base64,R0lGODdhGAAYAOMAAAAAwGCE3yAsQEBYv0BYgH+w/wAAf8DAwICAgAAAgP///0BAQAAA/wAAAAAAAAAAACwAAAAAGAAYAAAEc7DISauVo7DNu/+MoYHkJ5Yod6boypLngsx0bdfJiSh87/8KAQGR0+yASB6hQNQlk8KmUXE4zKy0Z5FxRFS9ihr1tz2GZ+cxsuwTPxXs9rsXnwPrdt82we/7/38ALi8mI4SFhyCDiRuLjAYBBpKTlJWWkhEAOw==" alt="border=0">
+	 E-mail me</a>.
+	<a href="http://www.maths.nottingham.ac.uk/personal/anw">
+	 <img src="data:image/gif;base64,R0lGODdhFAAUAPIAAAAAAAAA/25ubr6+vufn5wAAAAAAAAAAACwAAAAAFAAUAAADWEi63CxkyEnrhEPozXvEgiUO32cBwICmZGZSQBCgs1RmsCzH7B1KMZ2u58KphEIi6IhMtpbB5u5pikpTPqa0lrU2scWQFwmGrs5nqnFEuTneiyJ71KnbNwkAOw==" alt="border=0">
+	 My home page</a>.
+	<a href="http://www.nottingham.ac.uk/">
+	 <img src="data:image/gif;base64,R0lGODdhGAAYAOcAACc+miVAmK232DdPozVLoTNJnzJHnjBHnClEn3KAtSVAm1Bnrml5tsLJ3y9Lni9HnihIoW6BviRCnVFrsj1UpWl7uTlOoTBLojVInS9Hoens8TNGmytHnefq71dwsSpFnJ+r0CpDnGqBvYSVxiU/l0pnrkpjrjVMoEdfqytHoC5CmVNssCVDmiZBm1JoryM9mE5iqzNMoTNKoTFGny5EnCdFnzlUqiJBmiI/miA/mN3g63iLwDhJn1x3tS9KoOjr73ODu1htsSlEmlRprVZlr8nP4U1msCM8lDZNoDdLoS9Moy1IoUdcqj9brOfr8VVnsSRAmCU+mX+SwzdTpCE8lTRNoU1fqTBJnTBHnV1wslNrsuDl7SJCmVBlrzVPpTxMol50tjFJoers8Ftws1psskRXoyRCnldorzxUpSg/mDFPpHWIvy1JoLzD3T1aqSlDnDxYqChDmydBmiZBmYCRwzdUo6222DdOoyA7kzdKo0hjrWF3tdTZ50VdqkRbqUJZpyhDni1EmVRusidDnSRDmiRBmiM/mSA9ljFOoI2ezDBKn0Ndqy9Ini1EnD9XpytCmipCmSNBnDBOoi9MoTVLnTdHn0FdrCtKnejr8CtGnWt+vihCmidCmSZAmFJjrMbL3zVJoGF0tDJFnUNYpylCnkNWp1ZrsyZEm25/uiVCmlRpsVNpsCM+mDVVoyI+lzVRoztKnzJNoDNLoV9ytYubyTlMoGV3tF1yti1Hnuns8EZZpi1DnitFnCpFmyZDl2d7uSQ9lTdMoTJInClFneXo7yZDmjRTqyU/mTlSpm14uD5RoSI/liI9liA7lCA5lHGKv19xtC9GnFpvrydDnkFTpzxToiE9mDxPok9krqq02UVdruvt8S1GnSZFoFptsi1CnStEmz1Xpj5Vp4OSwyFBmzpToztRpGR4tThLoTdLoDBKo0dcqSpGnShEmyhCm3wAAIQAAAAAAAAAAAAAADgAAFQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAsAAAAAAAAAACwAAAAAGAAYAAAI/gAtJAkWrFYtWHd4fAkGy9OXa8quDbhWK9gAdANEVSpQAEM6Hl7QzTr3qwKDc9qS5MHAI0mVSndmKDJwwACGaskYLGBS6lYpaE9QeaJUIE8VGRdEMaIRbYMVMERWmTLibZ2nW35QkNmzQYaSB+q+NaKBi5qpPl2UObKhzBM1NF2ewFBl68EFLD4ypRASA4g6IzZGEVACKtYVArruaPvDgIiPBxweZQoUpJQLWaViEfCCCsioMASqPBAkDBobFdza4XqUBdsvN0hotVnw48c4TdmQzIjxhwgFcJkgNQrkQYulV4E+6fi0bVuDbG3KqXPzJ0ioA7x8Ibjya0y5cI2K/mjo4CQXsR8dxO3a1SQDnQPDir15MAbXMDjgBDTHJGDLFh1e7JJHJldIwcEwJEgAgwnhAEDBMJbwUYQYZJhggzkINLKENoqMIIQcx5CQgC5rrCNJGkwIIIAGpohgTCNxuOMFENisMckmLUQRzSqAAFCDO0xkY4cGYzxjzDCkvEEKAojQ8YYQcwBwwipycFLDByAQgwkmInCDQAjTvAEABBzQMcwmCrzQyxCRUFIHL20k0gAxI6yQSDWAxPKGGpesccocUFABzAolSBNLJsrRIcAOm8QAwhnl8EJLEMqc4ougXKxgCQx1sAEHKrTQ4UcxcgzyQCZTTDCGEIPIAYwzsYagYEQoerDzwCmZRKBJMRJc4EUfI/ihSifdFGNIMzm4cksZZWTxiiTTKDKLCSfUEYQIJ+wRCwmRsECFK4e4Qk4CZZTACxjGTBFOHU20cs4iayBzChRmcGENMzlQQc4NQ/QgjBtnpDDCOR5oAkMFDiggQSFmFOIKHtbggQMwRyhyBhihKCGMINLcQkELJAQQhS9mBLqMITkAk+wNeBCSygpASEJIC4OwAowCqSgQCRcBAQA7" alt="border=0">
+	 The University of Nottingham</a>.
+<hr>
+Copyright © Dr A. N. Walker, 1997.
+<br>
+This Web page may be freely used for purposes related to the
+above module or for private study;
+requests for permission to make other uses should be referred
+to the author.
+
+
+</body></html>
