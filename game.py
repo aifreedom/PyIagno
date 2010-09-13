@@ -66,6 +66,9 @@ class IagnoGame(object):
         self.__Player = self.BRD_DARK  # initial player: Dark
         self.__End = False
 
+        self.__DarkCnt = 0
+        self.__LightCnt = 0
+
         self.__Maintain()
 
     # =======================================================
@@ -108,6 +111,20 @@ class IagnoGame(object):
     # =======================================================
     # Overloaded methods
     # =======================================================
+    def __getattr__(self, attrname):
+        if attrname == 'Player':
+            return self.__Player
+        elif attrname == 'Valid':
+            return tuple(copy.deepcopy(self.__Valid))
+        elif attrname == 'IsEnd':
+            return self.__End
+        elif attrname == 'DarkCnt':
+            return self.__DarkCnt
+        elif attrname == 'LightCnt':
+            return self.__LightCnt
+        else:
+            raise AttributeError, attrname
+        
     def __len__(self):
         """
         The length of a game is the current number of steps
@@ -169,22 +186,32 @@ class IagnoGame(object):
 
     def __Maintain(self):
         """
-        Maintains the valid positions for each player.
+        Maintains the valid positions and pieces count for each
+        player.
         """
         self.__Valid[0] = []
         self.__Valid[1] = []
-        for pos in [(x, y) for x in range(8) for y in range(8)]:
-            x, y = pos
-            if self[x][y] == self.BRD_BLANK:
-                for color in range(2):
-                    for d in self.__dir:
-                        try:
-                            self.__Find(color, pos, d)
-                        except:
-                            pass
-                        else:
-                            self.__Valid[color].append(pos)
-                            break
+        self.__LightCnt = 0
+        self.__DarkCnt = 0
+        
+        for (x, line) in enumerate(self):
+            for (y, piece) in enumerate(line):
+                pos = (x, y)
+                if piece == IagnoGame.BRD_BLANK:   # check valid pos
+                    for color in range(2):
+                        for d in self.__dir:
+                            try:
+                                self.__Find(color, pos, d)
+                            except:
+                                pass
+                            else:
+                                self.__Valid[color].append(pos)
+                                break
+                elif piece == IagnoGame.BRD_LIGHT:  # count pieces
+                    self.__LightCnt += 1
+                elif piece == IagnoGame.BRD_DARK:
+                    self.__DarkCnt += 1
+                
         if self.__Valid[0] == [] and self.__Valid[1] == []:
             self.__End = True
 
