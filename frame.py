@@ -5,7 +5,10 @@ import wx
 from game import IagnoGame
 
 class IagnoFrame(wx.Frame):
-    
+
+    # Player movement instructions
+    PlayerStr = ("Dark's move", "Light's move")
+
     # =======================================================
     # Constructor
     # =======================================================
@@ -55,7 +58,7 @@ class IagnoFrame(wx.Frame):
         else:
             for yy, xx in l:
                 self.__Draw(player, (xx, yy))
-            self.frame_statusbar.SetStatusText(IagnoGame.PlayerStr[self.Game.GetPlayer()], 0)
+            self.frame_statusbar.SetStatusText(IagnoFrame.PlayerStr[self.Game.GetPlayer()], 0)
             self.frame_statusbar.SetStatusText("Dard: %d Light: %d" % (self.Game.DarkCnt, self.Game.LightCnt), 1)
 
     def OnPaint(self, evt):
