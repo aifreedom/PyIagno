@@ -7,9 +7,9 @@ from frame import IagnoFrame
 
 class IagnoApp(wx.App):
     def OnInit(self):
-        frame_1 = IagnoFrame(None, -1, "PyIango")
-        self.SetTopWindow(frame_1)
-        frame_1.Show()
+        self.frame = IagnoFrame(None, -1, "PyIango")
+        self.SetTopWindow(self.frame)
+        self.frame.Show()
         return 1
 
 # end of class MyApp
