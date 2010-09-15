@@ -64,7 +64,20 @@ class IagnoFrame(wx.Frame):
         dc = wx.ClientDC(self)
         dc.DrawBitmap(self.Bitmaps[color], x*40, y*40, True)
         
-
+    def __AIMove(self, aiPlayer):
+        while self.Game.Player == aiPlayer:
+            x, y = self.Game.ai(self.Game.Board, aiPlayer, len(self.Game))
+            try:
+                l = self.Game.Set((x, y))
+            except self.Game.InvalidPositionException:
+                self.frame_statusbar.SetStatusText('Invalid move.', 0)
+                raise 'AI Error'
+            else:
+                for yy, xx in l:
+                    self.__Draw(aiPlayer, (xx, yy))
+                    self.frame_statusbar.SetStatusText(IagnoFrame.PlayerStr[self.Game.Player], 0)
+                self.frame_statusbar.SetStatusText("Dard: %d Light: %d" % (self.Game.DarkCnt, self.Game.LightCnt), 1)
+                
     # =======================================================
     # Event handlers
     # =======================================================
@@ -96,20 +109,6 @@ class IagnoFrame(wx.Frame):
             for j in range(8):
                 dc.DrawBitmap(self.Bitmaps[self.Game[i][j]], j*sz[0], i*sz[1], True)
 
-    def __AIMove(self, aiPlayer):
-        while self.Game.Player == aiPlayer:
-            x, y = self.Game.ai(self.Game.Board, aiPlayer, len(self.Game))
-            try:
-                l = self.Game.Set((x, y))
-            except self.Game.InvalidPositionException:
-                self.frame_statusbar.SetStatusText('Invalid move.', 0)
-                raise 'AI Error'
-            else:
-                for yy, xx in l:
-                    self.__Draw(aiPlayer, (xx, yy))
-                    self.frame_statusbar.SetStatusText(IagnoFrame.PlayerStr[self.Game.Player], 0)
-                self.frame_statusbar.SetStatusText("Dard: %d Light: %d" % (self.Game.DarkCnt, self.Game.LightCnt), 1)
-                
 
 
 # end of class IagnoFrame
