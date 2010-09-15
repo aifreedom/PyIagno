@@ -47,14 +47,6 @@
                return NULL;
           }
      }
-     for (i=0; i<8; i++)
-     {
-          for (j=0; j<8; j++)
-          {
-               printf("%d ", temp[i][j]);
-          }
-          printf("\n");
-     }     
      $1 = temp;
  }
 
