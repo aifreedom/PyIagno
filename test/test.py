@@ -21,13 +21,13 @@
 import unittest
 
 from gametest import *
-# from aitest import *
+from aitest import *
 
 if __name__ == '__main__':
     testSuite = unittest.TestSuite()
 
     testSuite.addTest(gameSuite)
-    TestSuite.addTest(aiSuite)
+    testSuite.addTest(aiSuite)
     
     runner = unittest.TextTestRunner()
     runner.run(testSuite)

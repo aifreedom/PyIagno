@@ -40,7 +40,7 @@ class InitGameTest(unittest.TestCase):
 
     def testInitPlayerColor(self):
         """Test if the first player is Dark."""
-        assert self.Game.GetPlayer() == IagnoGame.BRD_DARK
+        assert self.Game.Player == IagnoGame.BRD_DARK
 
     def testValidSet1(self):
         """Set a dark piece at pos (2, 3)."""
@@ -184,13 +184,12 @@ class InitGameTest(unittest.TestCase):
                           self.Game.Set, (2, 4))
 
         
+gameSuite = unittest.TestSuite()
+
+# Test initial outline
+initSuite = unittest.makeSuite(InitGameTest, 'test')
+gameSuite.addTest(initSuite)
 
 if __name__ == '__main__':
-    suite = unittest.TestSuite()
-
-    # Test initial outline
-    initSuite = unittest.makeSuite(InitGameTest, 'test')
-    suite.addTest(initSuite)
-    
     runner = unittest.TextTestRunner()
-    runner.run(suite)
+    runner.run(gameSuite)
