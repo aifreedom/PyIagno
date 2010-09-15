@@ -65,7 +65,7 @@ class IagnoFrame(wx.Frame):
         dc.DrawBitmap(self.Bitmaps[color], x*40, y*40, True)
         
     def __AIMove(self, aiPlayer):
-        while self.Game.Player == aiPlayer:
+        while not self.IsEnd and self.Game.Player == aiPlayer:
             x, y = self.Game.ai(self.Game.Board, aiPlayer, len(self.Game))
             try:
                 l = self.Game.Set((x, y))
