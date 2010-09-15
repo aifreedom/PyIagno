@@ -12,13 +12,15 @@ PHONY = clean
 # the library plus its wrapper
 _ai.so: $(CLIB)/ai_wrap.o $(CLIB)/ai.o
 	gcc -shared $(CLIB)/ai_wrap.o $(CLIB)/ai.o -L$(PYLIB) -lpython2.6 -o $@
+	mv $(CLIB)/ai.py .
+
 
 # generated wrapper module code
 $(CLIB)/ai_wrap.o: $(CLIB)/ai_wrap.c $(CLIB)/ai.h
 	gcc $(CLIB)/ai_wrap.c -g -I$(CLIB) -I$(PYINC) -c -o $@
 
 $(CLIB)/ai_wrap.c: $(CLIB)/ai.i
-	swig -python -I$(CLIB) -o $(CLIB)/ai_wrap.c $(CLIB)/ai.i
+	swig -python -I$(CLIB) -outdir $(CLIB)/ $(CLIB)/ai.i
 
 # C library code (in another directory)
 $(CLIB)/ai.o: $(CLIB)/ai.c $(CLIB)/ai.h
