@@ -19,6 +19,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
 import copy
+import pprint
 
 class IagnoGame(object):
     """
@@ -50,24 +51,28 @@ class IagnoGame(object):
                          [-1, -1, -1,  0,  1, -1, -1, -1],
                          [-1, -1, -1, -1, -1, -1, -1, -1],
                          [-1, -1, -1, -1, -1, -1, -1, -1],
-                         [-1, -1, -1, -1, -1, -1, -1, -1]]):
+                         [-1, -1, -1, -1, -1, -1, -1, -1]],
+                 l = 0,
+                 player = 0):
         """
         Initialize a new game.
         param init: the initial outline of the game.
         """
         self.__Board = copy.deepcopy(init) # set the initial board
         
-        self.__Len = 0                 # steps been taken
+        self.__Len = l                 # steps been taken
 
         self.__Valid = []              # valid place to set
         self.__Valid.append([])
         self.__Valid.append([])
         
-        self.__Player = self.BRD_DARK  # initial player: Dark
+        self.__Player = player         # initial player
         self.__End = False
 
         self.__DarkCnt = 0
         self.__LightCnt = 0
+
+        self.ai = ai
 
         self.__Maintain()
 
