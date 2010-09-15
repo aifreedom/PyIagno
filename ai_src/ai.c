@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
+#include <assert.h>
 #include "ai.h"
 
 #define BRD_WIDTH 8
@@ -24,7 +26,19 @@ int easy_ai(int board[8][8], int player, int steps)
      int *valid = (int*)malloc(BRD_WIDTH*BRD_HEIGHT*sizeof(int));
      int valid_cnt;
      get_valid(board, player, valid, &valid_cnt);
-     return valid[0];
+     srand((unsigned int)time(NULL));
+     if (valid_cnt == 0)
+     {
+          int i, j;
+          for (i=0; i<8; i++)
+          {
+               for (j=0; j<8; j++)
+                    printf("%d ", board[i][j]);
+               putchar('\n');
+          }
+     }
+     assert(valid_cnt != 0);
+     return valid[rand()%valid_cnt];
 }
 
 
