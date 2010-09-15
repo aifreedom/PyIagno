@@ -81,7 +81,8 @@ class IagnoGame(object):
         If pos is not valid for player, raises InvalidPositionException.
         """
         player = self.__Player
-        if pos in self.GetValid(player):
+        if pos in self.Valid[player]:
+            # self.__Output('Step: %d, Player: %s' % (len(self)+1, ('Dark', 'Light')[player]))
             x, y = pos
             self.__Board[x][y] = player
             self.__Len += 1
@@ -90,23 +91,6 @@ class IagnoGame(object):
         else:
             raise self.InvalidPositionException
         
-    def GetValid(self, player):
-        """
-        Returns the valid posiitions for player.
-        """
-        return tuple(self.__Valid[player])
-
-    def GetPlayer(self):
-        """
-        Returns the color of the current player.
-        """
-        return self.__Player
-
-    def IsEnd(self):
-        """
-        Returns if the game is end.
-        """
-        return self.__End
 
     # =======================================================
     # Overloaded methods
@@ -118,6 +102,8 @@ class IagnoGame(object):
             return tuple(copy.deepcopy(self.__Valid))
         elif attrname == 'IsEnd':
             return self.__End
+        elif attrname == 'Board':
+            return copy.deepcopy(self.__Board)
         elif attrname == 'DarkCnt':
             return self.__DarkCnt
         elif attrname == 'LightCnt':
@@ -211,22 +197,21 @@ class IagnoGame(object):
                     self.__LightCnt += 1
                 elif piece == IagnoGame.BRD_DARK:
                     self.__DarkCnt += 1
+        if self.Valid[self.__Player] == []:
+            self.__Player = int(not self.__Player)
                 
-        if self.__Valid[0] == [] and self.__Valid[1] == []:
+        if self.Valid[0] == [] and self.Valid[1] == []:
             self.__End = True
 
     # =======================================================
     # For debug only
     # =======================================================
-    def Output(self, msg=''):
+    def __Output(self, msg=''):
         """
         For debug only, print the current board.
         """
         print 'PyIagno Debug:'
         print msg
-        for i in self.__Board:
-            for j in i:
-                print j,
-            print
+        pprint.PrettyPrinter().pprint(self.Board)
 
 # end of class IagnoGame
