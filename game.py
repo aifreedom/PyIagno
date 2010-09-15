@@ -87,7 +87,7 @@ class IagnoGame(object):
         """
         player = self.__Player
         if pos in self.Valid[player]:
-            # self.__Output('Step: %d, Player: %s' % (len(self)+1, ('Dark', 'Light')[player]))
+            self.__Output('Step: %d, Player: %s, (%d, %d)' % (len(self)+1, ('Dark', 'Light')[player], pos[0], pos[1]))
             x, y = pos
             self.__Board[x][y] = player
             self.__Len += 1
@@ -152,6 +152,51 @@ class IagnoGame(object):
         self.__Maintain()
         return tuple(ret)
 
+    # def __Find(self, color, pos, d):
+    #     """
+    #     Find the consecutive grids which have different color with the color of pos in direction d.
+    #     Returns the tuple of founded positons.
+    #     If not found, raises NotFoundException.
+    #     """
+    #     x, y = pos
+    #     dx, dy = d
+    #     ret = []
+    #     x += dx
+    #     y += dy
+    #     while self[x][y] != color:
+    #         if (not (x in range(8) and y in range(8))
+    #             or self[x][y] == self.BRD_BLANK):
+    #             break
+    #         ret.append((x, y))
+    #         x += dx
+    #         y += dy
+    #     else:
+    #         if ret != []:
+    #             return tuple(ret)
+    #     raise self.NotFoundException
+    
+    # def __Find(self, color, pos, d):
+    #     """
+    #     Find the consecutive grids which have different color with the color of pos in direction d.
+    #     Returns the tuple of founded positons.
+    #     If not found, raises NotFoundException.
+    #     """
+    #     x, y = pos
+    #     dx, dy = d
+    #     ret = []
+    #     x += dx
+    #     y += dy
+    #     while x in range(8) and y in range(8) and self[x][y] != color:
+    #         if self[x][y] == self.BRD_BLANK:
+    #             break
+    #         ret.append((x, y))
+    #         x += dx
+    #         y += dy
+    #     else:
+    #         if ret != [] or (x in range(8) and y in range(8)):
+    #             return tuple(ret)
+    #     raise self.NotFoundException
+
     def __Find(self, color, pos, d):
         """
         Find the consecutive grids which have different color with the color of pos in direction d.
@@ -163,15 +208,16 @@ class IagnoGame(object):
         ret = []
         x += dx
         y += dy
-        while self[x][y] != color:
-            if (not (x in range(8) and y in range(8))
-                or self[x][y] == self.BRD_BLANK):
+        while x in range(8) and y in range(8) and self[x][y] != color:
+            if self[x][y] == self.BRD_BLANK:
                 break
             ret.append((x, y))
             x += dx
             y += dy
         else:
-            if ret != []:
+            if x == -1:
+                print 'x == -1'
+            if x in range(8) and y in range(8) and ret != []:
                 return tuple(ret)
         raise self.NotFoundException
 
