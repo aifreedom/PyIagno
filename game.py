@@ -152,51 +152,6 @@ class IagnoGame(object):
         self.__Maintain()
         return tuple(ret)
 
-    # def __Find(self, color, pos, d):
-    #     """
-    #     Find the consecutive grids which have different color with the color of pos in direction d.
-    #     Returns the tuple of founded positons.
-    #     If not found, raises NotFoundException.
-    #     """
-    #     x, y = pos
-    #     dx, dy = d
-    #     ret = []
-    #     x += dx
-    #     y += dy
-    #     while self[x][y] != color:
-    #         if (not (x in range(8) and y in range(8))
-    #             or self[x][y] == self.BRD_BLANK):
-    #             break
-    #         ret.append((x, y))
-    #         x += dx
-    #         y += dy
-    #     else:
-    #         if ret != []:
-    #             return tuple(ret)
-    #     raise self.NotFoundException
-    
-    # def __Find(self, color, pos, d):
-    #     """
-    #     Find the consecutive grids which have different color with the color of pos in direction d.
-    #     Returns the tuple of founded positons.
-    #     If not found, raises NotFoundException.
-    #     """
-    #     x, y = pos
-    #     dx, dy = d
-    #     ret = []
-    #     x += dx
-    #     y += dy
-    #     while x in range(8) and y in range(8) and self[x][y] != color:
-    #         if self[x][y] == self.BRD_BLANK:
-    #             break
-    #         ret.append((x, y))
-    #         x += dx
-    #         y += dy
-    #     else:
-    #         if ret != [] or (x in range(8) and y in range(8)):
-    #             return tuple(ret)
-    #     raise self.NotFoundException
-
     def __Find(self, color, pos, d):
         """
         Find the consecutive grids which have different color with the color of pos in direction d.
@@ -215,8 +170,6 @@ class IagnoGame(object):
             x += dx
             y += dy
         else:
-            if x == -1:
-                print 'x == -1'
             if x in range(8) and y in range(8) and ret != []:
                 return tuple(ret)
         raise self.NotFoundException
