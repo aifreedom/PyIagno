@@ -1,3 +1,9 @@
 .rope*
 *.pyc
 *~
+/ai_src/ai.o
+/ai_src/ai.py
+/ai_src/ai_wrap.c
+/ai_src/ai_wrap.o
+/_ai.so
+/ai.py
