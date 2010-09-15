@@ -45,7 +45,7 @@ class IagnoFrame(wx.Frame):
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_LEFT_UP, self.OnClick)
         
-        self.Game = IagnoGame()
+        self.Game = IagnoGame(ai=easy_ai)
         self.__set_properties()
 
 
@@ -65,7 +65,7 @@ class IagnoFrame(wx.Frame):
         dc.DrawBitmap(self.Bitmaps[color], x*40, y*40, True)
         
     def __AIMove(self, aiPlayer):
-        while not self.IsEnd and self.Game.Player == aiPlayer:
+        while not self.Game.IsEnd and self.Game.Player == aiPlayer:
             x, y = self.Game.ai(self.Game.Board, aiPlayer, len(self.Game))
             try:
                 l = self.Game.Set((x, y))
