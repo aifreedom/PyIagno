@@ -75,9 +75,20 @@ class IagnoFrame(wx.Frame):
             else:
                 for yy, xx in l:
                     self.__Draw(aiPlayer, (xx, yy))
-                    self.frame_statusbar.SetStatusText(IagnoFrame.PlayerStr[self.Game.Player], 0)
-                self.frame_statusbar.SetStatusText("Dard: %d Light: %d" % (self.Game.DarkCnt, self.Game.LightCnt), 1)
+                self.__Update()
                 
+    def __Update(self):
+        if self.Game.IsEnd:
+            if self.Game.DarkCnt > self.Game.LightCnt:
+                self.frame_statusbar.SetStatusText('Dark wins!', 0)
+            elif self.Game.DarkCnt < self.Game.LightCnt:
+                self.frame_statusbar.SetStatusText('Light wins!', 0)
+            else:
+                self.frame_statusbar.SetStatusText('Draw...', 0)
+        else:
+            self.frame_statusbar.SetStatusText(IagnoFrame.PlayerStr[self.Game.Player], 0)
+        self.frame_statusbar.SetStatusText("Dard: %d Light: %d" % (self.Game.DarkCnt, self.Game.LightCnt), 1)
+
     # =======================================================
     # Event handlers
     # =======================================================
@@ -92,8 +103,7 @@ class IagnoFrame(wx.Frame):
         else:
             for yy, xx in l:
                 self.__Draw(player, (xx, yy))
-            self.frame_statusbar.SetStatusText(IagnoFrame.PlayerStr[self.Game.Player], 0)
-            self.frame_statusbar.SetStatusText("Dard: %d Light: %d" % (self.Game.DarkCnt, self.Game.LightCnt), 1)
+            self.__Update()
 
             # if is human-AI game
             if not self.Game.IsEnd and self.Game.ai:
@@ -108,7 +118,6 @@ class IagnoFrame(wx.Frame):
         for i in range(8):
             for j in range(8):
                 dc.DrawBitmap(self.Bitmaps[self.Game[i][j]], j*sz[0], i*sz[1], True)
-
-
+                
 
 # end of class IagnoFrame
