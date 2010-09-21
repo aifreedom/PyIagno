@@ -76,3 +76,5 @@
 
 
 extern int easy_ai(int board[8][8], int player, int steps);
+extern int medium_ai(int board[8][8], int player, int steps);
+extern int insane_ai(int board[8][8], int player, int steps);
