@@ -163,15 +163,13 @@ class IagnoGame(object):
         ret = []
         x += dx
         y += dy
-        while x in range(8) and y in range(8) and self[x][y] != color:
-            if self[x][y] == self.BRD_BLANK:
-                break
+        while x in range(8) and y in range(8) and self[x][y] == (not color):
             ret.append((x, y))
             x += dx
             y += dy
-        else:
-            if x in range(8) and y in range(8) and ret != []:
-                return tuple(ret)
+            
+        if x in range(8) and y in range(8) and self[x][y] == color and ret != []:
+            return tuple(ret)
         raise self.NotFoundException
 
     def __Maintain(self):
