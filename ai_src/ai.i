@@ -54,7 +54,7 @@
                     else
                     {
                          PyErr_SetString(PyExc_ValueError,
-                                         "Sequence elements must be numbers");      
+                                         "Sequence elements must be numbers");
                          return NULL;
                     }
                }
