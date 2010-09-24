@@ -199,6 +199,8 @@ class IagnoGame(object):
                     self.__LightCnt += 1
                 elif piece == IagnoGame.BRD_DARK:
                     self.__DarkCnt += 1
+        print self.Valid[0]
+        print self.Valid[1]
         if self.Valid[self.__Player] == []:
             self.__Player = int(not self.__Player)
                 
