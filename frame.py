@@ -45,7 +45,8 @@ class IagnoFrame(wx.Frame):
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_LEFT_UP, self.OnClick)
         
-        self.Game = IagnoGame(ai=easy_ai)
+        self.Game = IagnoGame(ai=insane_ai)
+        # self.Game = IagnoGame(ai=None)
         self.__set_properties()
 
 
