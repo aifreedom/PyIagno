@@ -20,7 +20,7 @@
 
 import wx
 from game import IagnoGame
-from ai import *
+# from ai import *
 
 class IagnoFrame(wx.Frame):
 
@@ -37,29 +37,46 @@ class IagnoFrame(wx.Frame):
         wx.Frame.__init__(self, *args, **kwds)
         self.frame_statusbar = self.CreateStatusBar(2, 0)
 
-        self.Bitmaps = [wx.Bitmap("image/dark.png", wx.BITMAP_TYPE_ANY),
-                        wx.Bitmap("image/light.png", wx.BITMAP_TYPE_ANY),
-                        wx.Bitmap("image/blank.png", wx.BITMAP_TYPE_ANY)]
+        self.Board = IagnoBoard(self)
 
-        
-        self.Bind(wx.EVT_PAINT, self.OnPaint)
-        self.Bind(wx.EVT_LEFT_UP, self.OnClick)
-        
-        self.Game = IagnoGame(ai=insane_ai)
-        # self.Game = IagnoGame(ai=None)
         self.__set_properties()
+
 
 
     def __set_properties(self):
         self.SetTitle("PyIango")
         self.SetSize((320, 346))
         self.frame_statusbar.SetStatusWidths([-4, -6])
-        self.frame_statusbar.SetStatusText(IagnoFrame.PlayerStr[self.Game.Player], 0)
-        self.frame_statusbar.SetStatusText("Dard: %d Light: %d" % (self.Game.DarkCnt, self.Game.LightCnt), 1)
+        self.frame_statusbar.SetStatusText(IagnoFrame.PlayerStr[self.Board.Game.Player], 0)
+        self.frame_statusbar.SetStatusText("Dard: %d Light: %d" % (self.Board.Game.DarkCnt, self.Board.Game.LightCnt), 1)
         # frame_statusbar_fields = ["Dark's Move", "Dark: 2 Light: 2"]
         # for i in range(len(frame_statusbar_fields)):
         #     self.frame_statusbar.SetStatusText(frame_statusbar_fields[i], i)
 
+
+# end of class IagnoFrame
+
+
+class IagnoBoard(wx.Window):
+    
+    def __init__(self, parent):
+        wx.Window.__init__(self, parent)
+
+        # self.Game = IagnoGame(ai=insane_ai)
+        self.Game = IagnoGame(ai=None)
+        self.Bitmaps = [wx.Bitmap("image/dark.png", wx.BITMAP_TYPE_ANY),
+                        wx.Bitmap("image/light.png", wx.BITMAP_TYPE_ANY),
+                        wx.Bitmap("image/blank.png", wx.BITMAP_TYPE_ANY)]
+        self.Images = [wx.Image("image/dark.png").ConvertToBitmap(),
+                       wx.Image("image/light.png").ConvertToBitmap(),
+                       wx.Image("image/blank.png").ConvertToBitmap()]
+
+        self.parent = parent
+        
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.Bind(wx.EVT_LEFT_UP, self.OnClick)
+        
+        
     def __Draw(self, color, pos):
         x, y = pos
         dc = wx.ClientDC(self)
@@ -71,7 +88,7 @@ class IagnoFrame(wx.Frame):
             try:
                 l = self.Game.Set((x, y))
             except self.Game.InvalidPositionException:
-                self.frame_statusbar.SetStatusText('Invalid move.', 0)
+                self.parent.frame_statusbar.SetStatusText('Invalid move.', 0)
                 raise 'AI Error'
             else:
                 for yy, xx in l:
@@ -81,14 +98,15 @@ class IagnoFrame(wx.Frame):
     def __Update(self):
         if self.Game.IsEnd:
             if self.Game.DarkCnt > self.Game.LightCnt:
-                self.frame_statusbar.SetStatusText('Dark wins!', 0)
+                self.parent.frame_statusbar.SetStatusText('Dark wins!', 0)
             elif self.Game.DarkCnt < self.Game.LightCnt:
-                self.frame_statusbar.SetStatusText('Light wins!', 0)
+                self.parent.frame_statusbar.SetStatusText('Light wins!', 0)
             else:
-                self.frame_statusbar.SetStatusText('Draw...', 0)
+                self.parent.frame_statusbar.SetStatusText('Draw...', 0)
         else:
-            self.frame_statusbar.SetStatusText(IagnoFrame.PlayerStr[self.Game.Player], 0)
-        self.frame_statusbar.SetStatusText("Dard: %d Light: %d" % (self.Game.DarkCnt, self.Game.LightCnt), 1)
+            self.parent.frame_statusbar.SetStatusText(IagnoFrame.PlayerStr[self.Game.Player], 0)
+        self.parent.frame_statusbar.SetStatusText("Dard: %d Light: %d" % (self.Game.DarkCnt, self.Game.LightCnt), 1)
+                
 
     # =======================================================
     # Event handlers
@@ -100,7 +118,7 @@ class IagnoFrame(wx.Frame):
         try:
             l = self.Game.Set((x/40, y/40))
         except self.Game.InvalidPositionException:
-            self.frame_statusbar.SetStatusText('Invalid move.', 0)
+            self.parent.frame_statusbar.SetStatusText('Invalid move.', 0)
         else:
             for yy, xx in l:
                 self.__Draw(player, (xx, yy))
@@ -118,7 +136,5 @@ class IagnoFrame(wx.Frame):
         dc = wx.PaintDC(self)
         for i in range(8):
             for j in range(8):
-                dc.DrawBitmap(self.Bitmaps[self.Game[i][j]], j*sz[0], i*sz[1], True)
-                
-
-# end of class IagnoFrame
+                dc.DrawBitmap(self.Images[self.Game[i][j]], j*sz[0], i*sz[1], True)
+    
