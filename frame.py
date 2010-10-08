@@ -39,20 +39,37 @@ class IagnoFrame(wx.Frame):
 
         self.Board = IagnoBoard(self)
 
+        menuBar = wx.MenuBar()
+        menuGame = wx.Menu()
+        menuBar.Append(menuGame, "Game")
+        simple = menuGame.Append(-1, "Simple menu item",
+                                 "This is some help text")
+        menuGame.AppendSeparator()
+        exit = menuGame.Append(-1, "Exit",
+                               "Selecting this item will exit the program")
+        
+        # self.Bind(wx.EVT_MENU, self.OnSimple, simple)
+        self.Bind(wx.EVT_MENU, self.OnExit, exit)
+
+        menuAbout = wx.Menu()
+        menuBar.Append(menuAbout, "About")
+        about = menuAbout.Append(-1, "About",
+                                 "About this program")
+        
+        self.SetMenuBar(menuBar)
+
         self.__set_properties()
 
+    def OnExit(self, event):
+        self.Close()
 
 
     def __set_properties(self):
         self.SetTitle("PyIango")
-        self.SetSize((320, 346))
-        self.frame_statusbar.SetStatusWidths([-4, -6])
+        self.SetSize((320, 366))
+        self.frame_statusbar.SetStatusWidths([-4, -3])
         self.frame_statusbar.SetStatusText(IagnoFrame.PlayerStr[self.Board.Game.Player], 0)
         self.frame_statusbar.SetStatusText("Dard: %d Light: %d" % (self.Board.Game.DarkCnt, self.Board.Game.LightCnt), 1)
-        # frame_statusbar_fields = ["Dark's Move", "Dark: 2 Light: 2"]
-        # for i in range(len(frame_statusbar_fields)):
-        #     self.frame_statusbar.SetStatusText(frame_statusbar_fields[i], i)
-
 
 # end of class IagnoFrame
 
